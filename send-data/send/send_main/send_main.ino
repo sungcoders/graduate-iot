@@ -1,3 +1,9 @@
+#include <util/delay.h>
+#include <avr/io.h>
+#include <avr/sfr_defs.h>
+#define sbi(PORT, bit) { PORT |=  (1<<bit); }
+#define cbi(PORT, bit) { PORT &= ~(1<<bit); }
+
 #include <Wire.h>
 #include <UIPEthernet.h>
 #include <PubSubClient.h> 
@@ -18,10 +24,10 @@ const int dhttype = DHT11;
 
 byte mac[] = { 0x54, 0x34, 0x41, 0x30, 0x30, 0x35 };
 uint8_t IP[]={192,168,1,67};
-const char* mqtt_server = "192.168.1.121";                      //172.26.80.17      172.26.80.100        
+const char* mqtt_server = "192.168.1.111";                      //172.26.80.17      172.26.80.100        
           EthernetClient Ethclient;
           PubSubClient client(Ethclient);
-
+extern volatile unsigned long timer0_millis;
 unsigned long tsensor=0, ts;
 byte countMQTT=0;                    
 void(* resetFunc) (void) = 0;//cài đặt hàm reset
@@ -54,9 +60,10 @@ void setup()
 
 void loop()
 {
-   if(Ethernet.linkStatus()!=LinkON)    {   ethernet(); }
-   if(!client.connected())  {  MQTTreconnect(); }
-   if(!client.loop()) client.connect("arduinoClient");
+   if(Ethernet.linkStatus()!=LinkON)    {   ethernet();       }
+   if(!client.connected())              {   MQTTreconnect();  }
+   if(!client.loop())                   {   client.connect("arduinoClient"); }
+   
    if((millis()-tsensor)>=8000)
     {
        DHT11sensor();
@@ -88,4 +95,17 @@ void loop()
 //      delay(1000);
 //      resetFunc();
 //    }
+    if(millis() >= 2592000000)  //30 day
+    {
+      tsensor =0;
+      milirst();
+    }
 } // end loop
+
+
+void milirst() 
+{
+  noInterrupts();
+  timer0_millis = 0;
+  interrupts();
+}
