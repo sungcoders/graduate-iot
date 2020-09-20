@@ -7,7 +7,6 @@ void ethernet()
     Ethernet.begin(mac,IP);
     while(Ethernet.linkStatus()!=LinkON)
       {                                       //https://www.arduino.cc/en/Reference/EthernetLinkStatus
-        Serial.println(Ethernet.linkStatus());
         for(int i=1; i<=20; i++)
           {
             Serial.print("Failed ethernet-waiting for 3s, times: " + String(i));
