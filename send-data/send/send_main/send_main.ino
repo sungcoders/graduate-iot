@@ -1,8 +1,11 @@
 #include <Wire.h>
+#include <SPI.h>
 #include <UIPEthernet.h>
 #include <PubSubClient.h> 
 #include <LiquidCrystal_I2C.h>
           LiquidCrystal_I2C lcd(0x27, 16, 2);
+#include <SD.h>
+          File f;
 #include "RTClib.h"
           RTC_DS1307 rtc;
 char daysOfTheWeek[7][12] = {"Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"};
@@ -15,7 +18,7 @@ char daysOfTheWeek[7][12] = {"Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"};
             // thông tin kết nối
 byte        mac[] = { 0x54, 0x34, 0x41, 0x30, 0x30, 0x35 };
 uint8_t     IP[]={192,168,1,67};
-const char* mqtt_server = "192.168.1.111";                             
+const char* mqtt_server = "192.168.1.2";                             
             EthernetClient Ethclient;
             PubSubClient client(Ethclient);
             // ********************************** khai báo biến***************************************//
@@ -32,10 +35,18 @@ void(* resetFunc) (void) = 0;               //cài đặt hàm reset
 void setup() 
 {
     Serial.begin(9600);
+    // SD
+    Serial.print("\nInitializing SD card...");
+    if (!SD.begin(4))
+    {
+      Serial.println("initialization failed!");
+      while (1);
+    }
+    Serial.println("initialization done.");
     // dùng cho ds18b20
     sensors_ds.begin();
     deviceCount = sensors_ds.getDeviceCount();
-    sprintf(extra,"Đang định vị ds18b20...tìm thấy: %d\tdevice",deviceCount);
+    sprintf(extra,"\nĐang định vị ds18b20...tìm thấy: %d\tdevice",deviceCount);
     Serial.println(extra);
     // lệnh cho lcd
     lcd.begin();
@@ -66,9 +77,10 @@ void loop()
    if(Ethernet.linkStatus()!=LinkON)    {   ethernet();       }
    if(!client.connected())              {   MQTTreconnect();  }
    if(!client.loop())                   {   client.connect("arduinoClient"); }
-   if((millis()-tsensor)>=8000)
+   if((millis()-tsensor)>=1000)
     {
        multi_ds18b20();
+       sd_card();
        client.publish("mega1/pub","day la mega");
        client.subscribe("mega1/#");
        tsensor=millis();

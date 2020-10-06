@@ -2,7 +2,7 @@
 //------------------------enthernet-----------------------------------
 void ethernet() 
 {
-  Serial.print("connecting ethernet :");
+  Serial.print("connecting ethernet :\n");
   lcd.clear();
   lcd.print("conneting E ...");
   Ethernet.begin(mac,IP);
@@ -21,7 +21,7 @@ void ethernet()
         delay(200);
         if (Ethernet.linkStatus() == Unknown) 
           {
-            Serial.println("Kiểm tra dây bus của bạn ???");
+            Serial.println("  Kiểm tra dây bus của bạn ???");
             lcd.clear();
             lcd.print(" E & M connect !");
             lcd.setCursor(0,1);
@@ -124,25 +124,100 @@ void callback(char* topic, byte* message, unsigned int length)
     Serial.print(topic);
     Serial.print(".\tnội dung: ");
     String messageTemp;
-  
-    for (int i = 0; i < length; i++)
+    for (byte i = 0; i < length; i++)
       {
         Serial.print((char)message[i]);
         messageTemp += (char)message[i];
       }
-    if((String)topic=="room/lamp")
-      {                    // room/lamp == relay1      room/relay2 == relay2
+    if((String)topic=="van1")
+      {
         Serial.print("Changing Room lamp to ");
-        if(messageTemp == "on")
+        if(messageTemp == "on_van1")
           {
-            digitalWrite(13, HIGH);
-            Serial.print(" led8 On");
+            digitalWrite(34, HIGH);
+            Serial.print(" led gpio 34 On");
           }
-        else if(messageTemp == "off")
+        else if(messageTemp == "off_van1")
           {
-            digitalWrite(13, LOW);
-            Serial.print("led8 Off");
+            digitalWrite(34, LOW);
+            Serial.print("led gpio 34 Off");
           }
-  }// end if
+        else {Serial.println("check your on payload topic MQTT");}
+      }// end if
+    if((String)topic=="van2")
+      {
+        Serial.print("Điều Khiển Van2: ");
+        if(messageTemp == "on_van2")
+          {
+            digitalWrite(40, HIGH);
+            Serial.print(" led gpio 40 On");
+          }
+        else if(messageTemp == "off_van2")
+          {
+            digitalWrite(40, LOW);
+            Serial.print("led gpio 40 Off");
+          }
+        else {Serial.println("check your on payload topic MQTT");}
+      }// end if
+    if((String)topic=="dc1")
+      {
+        Serial.print("Điều Khiển Van2: ");
+        if(messageTemp == "on_dc1")
+          {
+            digitalWrite(46, HIGH);
+            Serial.print(" led gpio 46 On");
+          }
+        else if(messageTemp == "off_dc1")
+          {
+            digitalWrite(46, LOW);
+            Serial.print("led gpio 46 Off");
+          }
+        else {Serial.println("check your on payload topic MQTT");}
+      }// end if
+    if((String)topic=="dc2")
+      {
+        Serial.print("Điều Khiển Van2: ");
+        if(messageTemp == "on_dc2")
+          {
+            digitalWrite(48, HIGH);
+            Serial.print(" led gpio 48 On");
+          }
+        else if(messageTemp == "off_dc2")
+          {
+            digitalWrite(48, LOW);
+            Serial.print("led gpio 48 Off");
+          }
+        else {Serial.println("check your on payload topic MQTT");}
+      }// end if
+    if((String)topic=="ac1")
+      {
+        Serial.print("Điều Khiển động cơ ac1: ");
+        if(messageTemp == "on_ac1")
+          {
+            digitalWrite(42, HIGH);
+            Serial.print(" led gpio 42 On");
+          }
+        else if(messageTemp == "off_ac1")
+          {
+            digitalWrite(42, LOW);
+            Serial.print("led gpio 42 Off");
+          }
+        else {Serial.println("check your on payload topic MQTT");}
+      }// end if
+    if((String)topic=="ac2")
+      {
+        Serial.print("Điều Khiển động cơ ac2: ");
+        if(messageTemp == "on_ac2")
+          {
+            digitalWrite(44, HIGH);
+            Serial.print(" led gpio 44 On");
+          }
+        else if(messageTemp == "off_ac2")
+          {
+            digitalWrite(44, LOW);
+            Serial.print("led gpio 44 Off");
+          }
+        else {Serial.println("check your on payload topic MQTT");}
+      }// end if
     Serial.println();
   }// end callback
