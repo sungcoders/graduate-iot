@@ -12,20 +12,33 @@ char daysOfTheWeek[7][12] = {"Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"};
 
 #include <DallasTemperature.h>
 #include <OneWire.h>
-#define   ONE_WIRE_BUS 2
+#define   ONE_WIRE_BUS 3
           OneWire onewire(ONE_WIRE_BUS);
           DallasTemperature sensors_ds(&onewire);
+#include "GravityTDS.h"
+#define   TdsSensorPin A1
+          GravityTDS gravityTds;
+#define   VREF 5.0      // analog reference voltage(Volt) of the ADC
+#define   SCOUNT  30           // sum of sample point
             // thông tin kết nối
 byte        mac[] = { 0x54, 0x34, 0x41, 0x30, 0x30, 0x35 };
 uint8_t     IP[]={192,168,1,67};
-const char* mqtt_server = "192.168.1.2";                             
+const char* mqtt_server = "192.168.1.11";                             
             EthernetClient Ethclient;
             PubSubClient client(Ethclient);
-            // ********************************** khai báo biến***************************************//
+            // ********************************** khai báo biến ***************************************//
 int         deviceCount;                    // biến nhận số lượng ds18b20
 byte        countMQTT=0;                    // biến đếm MQTT
 char        extra[100];                     // biến lưu tạm thời toàn cục
-            // ********************************** khai báo hàm con***************************************//
+            // ********************************** khai báo TDS ***************************************//
+//int         analogBuffer[SCOUNT];    // store the analog value in the array, read from ADC
+//int         analogBufferTemp[SCOUNT];
+//int         analogBufferIndex = 0,copyIndex = 0;
+//float       averageVoltage = 0,tdsValue = 0,temperature = 25;
+int         a=0,y=0;
+//byte        x=0;
+float temperature = 25,tdsValue = 0;
+            // ********************************** khai báo hàm con ***************************************//
 extern volatile unsigned long timer0_millis;
 unsigned long tsensor=0, ts;                    
 void(* resetFunc) (void) = 0;               //cài đặt hàm reset
@@ -40,20 +53,31 @@ void setup()
     if (!SD.begin(4))
     {
       Serial.println("initialization failed!");
-      while (1);
     }
-    Serial.println("initialization done.");
+    else{ Serial.println("initialization done."); }
     // dùng cho ds18b20
     sensors_ds.begin();
+    delay(10);
     deviceCount = sensors_ds.getDeviceCount();
-    sprintf(extra,"\nĐang định vị ds18b20...tìm thấy: %d\tdevice",deviceCount);
+    sprintf(extra,"\nĐang định vị ds18b20...tìm thấy: %d device",deviceCount);
     Serial.println(extra);
+    // lệnh cho TDS
+    gravityTds.setPin(TdsSensorPin);
+    gravityTds.setAref(5.0);  //reference voltage on ADC, default 5.0V on Arduino UNO
+    gravityTds.setAdcRange(1024);  //1024 for 10bit ADC;4096 for 12bit ADC
+    gravityTds.begin();  //initialization
     // lệnh cho lcd
     lcd.begin();
     lcd.backlight();
     lcd.print("   start lcd");
     // khai báo chân
+    pinMode(TdsSensorPin,INPUT);
+    pinMode(38, OUTPUT);
+    pinMode(40, OUTPUT);
+    pinMode(42, OUTPUT);
+    pinMode(44, OUTPUT);
     pinMode(46, OUTPUT);
+    pinMode(48, OUTPUT);
     pinMode(13,OUTPUT);
     // dùng cho rtc
            multi_ds18b20();
@@ -77,13 +101,17 @@ void loop()
    if(Ethernet.linkStatus()!=LinkON)    {   ethernet();       }
    if(!client.connected())              {   MQTTreconnect();  }
    if(!client.loop())                   {   client.connect("arduinoClient"); }
-   if((millis()-tsensor)>=1000)
+   if((millis()-tsensor)>=5000)
     {
-       multi_ds18b20();
-       sd_card();
-       client.publish("mega1/pub","day la mega");
-       client.subscribe("mega1/#");
-       tsensor=millis();
+      multi_ds18b20();
+      sd_card();
+      client.publish("mega1/pub","day la mega");
+      client.subscribe("mega1/sub");
+      tsensor=millis();
+    }
+    if(millis()-a>3000)
+    {
+      tds();
     }
 //   if((millis()-ts)>=1000)
 //    {

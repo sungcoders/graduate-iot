@@ -8,7 +8,7 @@ void multi_ds18b20()
   float tempC,tempF;                   // gia tri *C va *F
   char tempc[10],tempf[10];            // cac bien tam thoi *C va *F
   char dsc[20],dsf[10];                // cac bien luu ket qua cuoi cung
-  const char ds18b20[20];              // cac MQTT topic
+  const char ds18b20[10];              // cac MQTT topic
   sensors_ds.requestTemperatures();
   for (int i = 0;  i < deviceCount;  i++)
   {
@@ -20,9 +20,10 @@ void multi_ds18b20()
       tempF=DallasTemperature::toFahrenheit(tempC);
       String tempf=(String)tempF;
       tempf.toCharArray(dsf,tempf.length()+1);
-      sprintf(dsc,"Sensor %d : %s *C\t|\t%s *F",i+1,tempc,dsf);
+      sprintf(dsc," %d : %s*C\t|\t%s*F",i+1,tempc,dsf);
       sprintf(ds18b20,"ds18b20_%d",i+1);
       client.publish(ds18b20,dsc);
+      Serial.println(dsc);
     }
     else if(tempC<limit_under)
     {
@@ -44,6 +45,24 @@ void rtcds1307()
   Serial.print((String)now.hour() + ":" + (String)now.minute() + ":" + (String)now.second() + String("\n"));
   Serial.print((String)daysOfTheWeek[now.dayOfTheWeek()] + String(",") + (String)now.day() + "/" + (String)now.month() + "/" + (String)now.year() + String("\n"));
 }
+
+
+void tds()
+{
+  
+  //temperature = readTemperature();  //add your temperature sensor and read it
+  gravityTds.setTemperature(temperature);  // set the temperature and execute temperature compensation
+  gravityTds.update();  //sample and calculate 
+  tdsValue = gravityTds.getTdsValue();  // then get the value
+  int tds = (int)tdsValue;
+  char tds_value[10];
+  sprintf(tds_value,"%d ppm",tds);
+  client.publish("TDS_sensor1",tds_value);
+  Serial.print(tds_value);
+  Serial.println("ppm");
+  delay(10);
+}
+
 
 void sd_card()
 {

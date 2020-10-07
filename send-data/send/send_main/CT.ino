@@ -74,7 +74,7 @@ void ethernet()
 void MQTTreconnect() 
   {
     int j=0;
-    while(!client.connected()) 
+    while(!client.connected())
       {
         j++;
         Serial.println("Số lần kết nối MQTT: " + String(j));
@@ -92,7 +92,13 @@ void MQTTreconnect()
             lcd.print(" E & M connect !");
             lcd.setCursor(0,1);
             lcd.print("MQTT Thành Công");
-            client.subscribe("mega1/#");
+            client.subscribe("mega1/sub");
+            client.subscribe("van1");
+            client.subscribe("van2");
+            client.subscribe("dc1");
+            client.subscribe("dc2");
+            client.subscribe("ac1");
+            client.subscribe("ac2");
           }
         else 
           {
@@ -131,37 +137,37 @@ void callback(char* topic, byte* message, unsigned int length)
       }
     if((String)topic=="van1")
       {
-        Serial.print("Changing Room lamp to ");
+        Serial.print("\nĐiều Khiển van 1 :");
         if(messageTemp == "on_van1")
-          {
-            digitalWrite(34, HIGH);
-            Serial.print(" led gpio 34 On");
-          }
-        else if(messageTemp == "off_van1")
-          {
-            digitalWrite(34, LOW);
-            Serial.print("led gpio 34 Off");
-          }
-        else {Serial.println("check your on payload topic MQTT");}
-      }// end if
-    if((String)topic=="van2")
-      {
-        Serial.print("Điều Khiển Van2: ");
-        if(messageTemp == "on_van2")
           {
             digitalWrite(40, HIGH);
             Serial.print(" led gpio 40 On");
           }
-        else if(messageTemp == "off_van2")
+        else if(messageTemp == "off_van1")
           {
             digitalWrite(40, LOW);
             Serial.print("led gpio 40 Off");
           }
         else {Serial.println("check your on payload topic MQTT");}
       }// end if
+    if((String)topic=="van2")
+      {
+        Serial.print("\nĐiều Khiển Van2: ");
+        if(messageTemp == "on_van2")
+          {
+            digitalWrite(38, HIGH);
+            Serial.print(" led gpio 38 On");
+          }
+        else if(messageTemp == "off_van2")
+          {
+            digitalWrite(38, LOW);
+            Serial.print("led gpio 38 Off");
+          }
+        else {Serial.println("check your on payload topic MQTT");}
+      }// end if
     if((String)topic=="dc1")
       {
-        Serial.print("Điều Khiển Van2: ");
+        Serial.print("\nĐiều Khiển Van2: ");
         if(messageTemp == "on_dc1")
           {
             digitalWrite(46, HIGH);
@@ -176,7 +182,7 @@ void callback(char* topic, byte* message, unsigned int length)
       }// end if
     if((String)topic=="dc2")
       {
-        Serial.print("Điều Khiển Van2: ");
+        Serial.print("\nĐiều Khiển dc2: ");
         if(messageTemp == "on_dc2")
           {
             digitalWrite(48, HIGH);
@@ -191,7 +197,7 @@ void callback(char* topic, byte* message, unsigned int length)
       }// end if
     if((String)topic=="ac1")
       {
-        Serial.print("Điều Khiển động cơ ac1: ");
+        Serial.print("\nĐiều Khiển động cơ ac1: ");
         if(messageTemp == "on_ac1")
           {
             digitalWrite(42, HIGH);
@@ -206,7 +212,7 @@ void callback(char* topic, byte* message, unsigned int length)
       }// end if
     if((String)topic=="ac2")
       {
-        Serial.print("Điều Khiển động cơ ac2: ");
+        Serial.print("\nĐiều Khiển động cơ ac2: ");
         if(messageTemp == "on_ac2")
           {
             digitalWrite(44, HIGH);
