@@ -54,9 +54,9 @@ void setup()
 
 void loop()
 {
-//   if(Ethernet.linkStatus()!=LinkON)    {   ethernet();       }
-//   if(!client.connected())              {   MQTTreconnect();  }
-//   if(!client.loop())                   {   client.connect("arduinoClient"); }
+   if(Ethernet.linkStatus()!=LinkON)    {   ethernet();       }
+   if(!client.connected())              {   MQTTreconnect();  }
+   if(!client.loop())                   {   client.connect("arduinoClient"); }
    if((millis()-tsensor)>=5000)
     {
       multi_ds18b20();

@@ -129,17 +129,14 @@ void MQTTreconnect()
 
 void init_send_once()
 {
-  if((Ethernet.linkStatus()==LinkON) && (client.connected()) )
+  while((Ethernet.linkStatus()==LinkON) && (client.connected()) )
   {
+    if(Ethernet.linkStatus()!=LinkON)    {   ethernet();       }
+    if(!client.connected())              {   MQTTreconnect();  }
+    if(!client.loop())                   {   client.connect("arduinoClient"); }
     client.publish("caytrong"," ");
     multi_ds18b20();
     tds();
-  }
-  else
-  {
-    ethernet();
-    delay(50);
-    MQTTreconnect();
   }
 }
 
