@@ -145,6 +145,12 @@ void init_startup()
     pinMode(46, OUTPUT);
     pinMode(48, OUTPUT);
     pinMode(13,OUTPUT);
+    digitalWrite(38,LOW);
+    digitalWrite(40,LOW);
+    digitalWrite(42,LOW);
+    digitalWrite(44,LOW);
+    digitalWrite(46,LOW);
+    digitalWrite(48,LOW);
     // dùng cho rtc
     Wire.begin();
 //    if (! rtc.begin()) {  Serial.print("Không tìm thấy RTC"); lcd.clear();  lcd.print("Không tìm thấy RTC");   while (1); }

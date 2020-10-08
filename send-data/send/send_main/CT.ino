@@ -100,6 +100,7 @@ void MQTTreconnect()
             client.subscribe("dc2");
             client.subscribe("ac1");
             client.subscribe("ac2");
+            client.publish("caytrong","cay_trong");
           }
         else 
           {
@@ -134,7 +135,6 @@ void init_send_once()
     if(Ethernet.linkStatus()!=LinkON)    {   ethernet();       }
     if(!client.connected())              {   MQTTreconnect();  }
     if(!client.loop())                   {   client.connect("arduinoClient"); }
-    client.publish("caytrong"," ");
     multi_ds18b20();
     tds();
   }

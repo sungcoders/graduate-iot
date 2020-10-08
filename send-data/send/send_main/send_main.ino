@@ -61,8 +61,7 @@ void loop()
     {
       multi_ds18b20();
       sd_card();
-      client.publish("mega1/pub","day la mega");
-      client.subscribe("mega1/sub");
+      client.publish("caytrong","cay_trong");
       tsensor=millis();
     }
     if(millis()-t_tds>3000)
