@@ -20,7 +20,7 @@ void multi_ds18b20()
       tempF=DallasTemperature::toFahrenheit(tempC);
       String tempf=(String)tempF;
       tempf.toCharArray(dsf,tempf.length()+1);
-      sprintf(dsc," %d : %s*C\t|\t%s*F",i+1,tempc,dsf);
+      sprintf(dsc,"%s*C\t|\t%s*F",tempc,dsf);
       sprintf(ds18b20,"ds18b20_%d",i+1);
       client.publish(ds18b20,dsc);
       Serial.println(dsc);
@@ -41,9 +41,21 @@ void multi_ds18b20()
 // ---------------------- RTC-----------------------------
 void rtcds1307() 
 {
+  char hhmmss_c[20],ddmmyy_c[20], rtc_time1[40],rtc_time2[40];
   DateTime now = rtc.now();
+  String hhmmss = String( (String)now.hour() + "h:" + (String)now.minute() + "m:" + (String)now.second() + String("s"));
+  hhmmss.toCharArray(hhmmss_c,hhmmss.length()+1);
+  String ddmmyy = String( (String)daysOfTheWeek[now.dayOfTheWeek()] + String(", ") + (String)now.day() + "/" + (String)now.month() + "/" + (String)now.year() );
+  ddmmyy.toCharArray(ddmmyy_c,ddmmyy.length()+1);
   Serial.print((String)now.hour() + ":" + (String)now.minute() + ":" + (String)now.second() + String("\n"));
   Serial.print((String)daysOfTheWeek[now.dayOfTheWeek()] + String(",") + (String)now.day() + "/" + (String)now.month() + "/" + (String)now.year() + String("\n"));
+  sprintf(rtc_time1,"%s",ddmmyy_c);
+  sprintf(rtc_time2,"%s",hhmmss_c);
+  Serial.print("ddmmyy: ");
+  Serial.println(rtc_time1);
+  Serial.println(hhmmss);
+  client.publish("ddmmyy_mqtt",rtc_time1);
+  client.publish("hhmmss_mqtt",rtc_time2);
 }
 
 
@@ -151,12 +163,30 @@ void init_startup()
     digitalWrite(44,LOW);
     digitalWrite(46,LOW);
     digitalWrite(48,LOW);
+    // dùng cho cảm biến dòng
+    emon.current(A0, 111.1); 
     // dùng cho rtc
     Wire.begin();
-//    if (! rtc.begin()) {  Serial.print("Không tìm thấy RTC"); lcd.clear();  lcd.print("Không tìm thấy RTC");   while (1); }
-//    if (! rtc.isrunning())  {Serial.print("RTC không hoạt động\n");  lcd.clear();  lcd.print("RTC not run");}
-// --------------???----------???-----------------------------------------------------
-//    rtc.adjust(DateTime(2020, 8, 3, 7, 39, 0));
+    if (! rtc.begin()) {  Serial.print("Không tìm thấy RTC"); lcd.clear();  lcd.print("Không tìm thấy RTC");}
+    else {Serial.println("RTC đang hoạt Động");}
+    if (! rtc.isrunning())  {Serial.print("RTC không hoạt động\n");  lcd.clear();  lcd.print("RTC not run");}
+    else {Serial.println("RTC đang hoạt Động");}
+// ------------- Set thoi gian -----------------------------------------------------
+//    rtc.adjust(DateTime(2020, 10, 10, 8, 28, 0));
 //    rtc.adjust(DateTime(F(__DATE__), F(__TIME__)));
-// --------------!!!------------!!!---------------------------------------------------
+    rtcds1307();
+}
+
+void YHDC100()
+{
+  char irms_c[15];
+  float Irmsf = emon.calcIrms(1480);
+  Irmsf = Irmsf*230.0;
+  String irmsf = (String)Irmsf;
+  irmsf.toCharArray(irms_c,irmsf.length()+1);
+  char YH[15];
+  sprintf(YH,"%s mA",irms_c);
+  client.publish("YHDC100",YH);
+  Serial.print("Dòng điện: ");
+  Serial.println(YH);
 }

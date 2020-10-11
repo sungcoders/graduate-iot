@@ -130,13 +130,18 @@ void MQTTreconnect()
 
 void init_send_once()
 {
-  while((Ethernet.linkStatus()==LinkON) && (client.connected()) )
+  while((Ethernet.linkStatus()!=LinkON) || (!client.connected()) )
   {
+    Serial.println(F("kiem tra ket noi void setup"));
     if(Ethernet.linkStatus()!=LinkON)    {   ethernet();       }
     if(!client.connected())              {   MQTTreconnect();  }
     if(!client.loop())                   {   client.connect("arduinoClient"); }
-    multi_ds18b20();
-    tds();
+    if((Ethernet.linkStatus()==LinkON) && (client.connected()))
+    {
+      multi_ds18b20();
+      tds();
+      YHDC100();
+    }
   }
 }
 
