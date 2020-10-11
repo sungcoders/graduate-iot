@@ -100,6 +100,8 @@ void MQTTreconnect()
             client.subscribe("dc2");
             client.subscribe("ac1");
             client.subscribe("ac2");
+            client.subscribe("tds_sub");
+            client.subscribe("yhdc_sub");
             client.publish("caytrong","cay_trong");
           }
         else 
@@ -125,25 +127,6 @@ void MQTTreconnect()
     Serial.println(F("MQTT thành công"));
     return 1;
   } //end MQTTconnect
-
-// ************************* khoi tao ket noi ban dau ************************
-
-void init_send_once()
-{
-  while((Ethernet.linkStatus()!=LinkON) || (!client.connected()) )
-  {
-    Serial.println(F("kiem tra ket noi void setup"));
-    if(Ethernet.linkStatus()!=LinkON)    {   ethernet();       }
-    if(!client.connected())              {   MQTTreconnect();  }
-    if(!client.loop())                   {   client.connect("arduinoClient"); }
-    if((Ethernet.linkStatus()==LinkON) && (client.connected()))
-    {
-      multi_ds18b20();
-      tds();
-      YHDC100();
-    }
-  }
-}
 
 //---------------------- callback from MQTT -------------------------------
 void callback(char* topic, byte* message, unsigned int length)
@@ -246,6 +229,24 @@ void callback(char* topic, byte* message, unsigned int length)
             Serial.print(F(" led gpio 44 Off"));
           }
         else {Serial.println(F("check your on payload topic MQTT"));}
+      }// end if
+      if((String)topic=="tds_sub")
+      {
+        Serial.print(F("\nGửi yêu cầu nhận TDS: "));
+        if(messageTemp == "click_tds")
+          {
+            tds();
+            Serial.print(F(" đã gửi tds"));
+          }
+      }// end if
+      if((String)topic=="yhdc_sub")
+      {
+        Serial.print(F("\nGửi yêu cầu nhận YHDC: "));
+        if(messageTemp == "click_YHDC")
+          {
+            YHDC100();
+            Serial.print(F(" đã gửi YHDC"));
+          }
       }// end if
     Serial.println();
   }// end callback

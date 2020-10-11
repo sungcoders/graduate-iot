@@ -58,7 +58,6 @@ void rtcds1307()
   client.publish("hhmmss_mqtt",rtc_time2);
 }
 
-
 void tds()
 {
   byte k=1;
@@ -121,60 +120,6 @@ void sd_card()
   {
     Serial.println(F("error opening test.txt"));
   }
-}
-
-void init_startup()
-{
-    Serial.begin(9600);
-    // SD card
-    Serial.print(F("\nInitializing SD card..."));
-    if (!SD.begin(4))
-    {
-      Serial.println(F("initialization failed!"));
-    }
-    else{ Serial.println(F("initialization done.")); }
-    // dùng cho ds18b20
-    sensors_ds.begin();
-    delay(10);
-    deviceCount = sensors_ds.getDeviceCount();
-    sprintf(extra,"\nĐang định vị ds18b20...tìm thấy: %d device",deviceCount);
-    Serial.println(extra);
-    // lệnh cho TDS
-    gravityTds.setPin(TdsSensorPin);
-    gravityTds.setAref(5.0);  //reference voltage on ADC, default 5.0V on Arduino UNO
-    gravityTds.setAdcRange(1024);  //1024 for 10bit ADC;4096 for 12bit ADC
-    gravityTds.begin();  //initialization
-    // lệnh cho lcd
-    lcd.begin();
-    lcd.backlight();
-    lcd.print("   start lcd");
-    // khai báo chân
-    pinMode(TdsSensorPin,INPUT);
-    pinMode(38, OUTPUT);
-    pinMode(40, OUTPUT);
-    pinMode(42, OUTPUT);
-    pinMode(44, OUTPUT);
-    pinMode(46, OUTPUT);
-    pinMode(48, OUTPUT);
-    pinMode(13,OUTPUT);
-    digitalWrite(38,LOW);
-    digitalWrite(40,LOW);
-    digitalWrite(42,LOW);
-    digitalWrite(44,LOW);
-    digitalWrite(46,LOW);
-    digitalWrite(48,LOW);
-    // dùng cho cảm biến dòng
-    emon.current(A0, 111.1); 
-    // dùng cho rtc
-    Wire.begin();
-    if (! rtc.begin()) {  Serial.print("Không tìm thấy RTC"); lcd.clear();  lcd.print("Không tìm thấy RTC");}
-    else {Serial.println("RTC đang hoạt Động");}
-    if (! rtc.isrunning())  {Serial.print("RTC không hoạt động\n");  lcd.clear();  lcd.print("RTC not run");}
-    else {Serial.println("RTC đang hoạt Động");}
-// ------------- Set thoi gian -----------------------------------------------------
-//    rtc.adjust(DateTime(2020, 10, 10, 8, 28, 0));
-//    rtc.adjust(DateTime(F(__DATE__), F(__TIME__)));
-    rtcds1307();
 }
 
 void YHDC100()
