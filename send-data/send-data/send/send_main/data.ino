@@ -20,7 +20,7 @@ void multi_ds18b20()
       tempF=DallasTemperature::toFahrenheit(tempC);
       String tempf=(String)tempF;
       tempf.toCharArray(dsf,tempf.length()+1);
-      sprintf(dsc,"%s*C\t|\t%s*F",tempc,dsf);
+      sprintf(dsc,"%s*C\t,\t%s*F",tempc,dsf);
       sprintf(ds18b20,"ds18b20_%d",i+1);
       client.publish(ds18b20,dsc);
       Serial.println(dsc);
@@ -39,23 +39,11 @@ void multi_ds18b20()
 }
 
 // ---------------------- RTC-----------------------------
-void rtcds1307() 
+void rtcds1307()
 {
-  char hhmmss_c[20],ddmmyy_c[20], rtc_time1[40],rtc_time2[40];
   DateTime now = rtc.now();
-  String hhmmss = String( (String)now.hour() + "h:" + (String)now.minute() + "m:" + (String)now.second() + String("s"));
-  hhmmss.toCharArray(hhmmss_c,hhmmss.length()+1);
-  String ddmmyy = String( (String)daysOfTheWeek[now.dayOfTheWeek()] + String(", ") + (String)now.day() + "/" + (String)now.month() + "/" + (String)now.year() );
-  ddmmyy.toCharArray(ddmmyy_c,ddmmyy.length()+1);
   Serial.print((String)now.hour() + ":" + (String)now.minute() + ":" + (String)now.second() + String("\n"));
   Serial.print((String)daysOfTheWeek[now.dayOfTheWeek()] + String(",") + (String)now.day() + "/" + (String)now.month() + "/" + (String)now.year() + String("\n"));
-  sprintf(rtc_time1,"%s",ddmmyy_c);
-  sprintf(rtc_time2,"%s",hhmmss_c);
-  Serial.print("ddmmyy: ");
-  Serial.println(rtc_time1);
-  Serial.println(hhmmss);
-  client.publish("ddmmyy_mqtt",rtc_time1);
-  client.publish("hhmmss_mqtt",rtc_time2);
 }
 
 void tds()
@@ -86,7 +74,7 @@ void tds()
       Serial.println();
     }
     k++;
-    delay(10);
+    delay(5);
   }
 }
 
@@ -124,14 +112,30 @@ void sd_card()
 
 void YHDC100()
 {
-  char irms_c[15];
-  float Irmsf = emon.calcIrms(1480);
-  Irmsf = Irmsf*230.0;
-  String irmsf = (String)Irmsf;
-  irmsf.toCharArray(irms_c,irmsf.length()+1);
-  char YH[15];
-  sprintf(YH,"%s mA",irms_c);
-  client.publish("YHDC100",YH);
-  Serial.print("Dòng điện: ");
-  Serial.println(YH);
+  float Dongdien;
+  float sensor;
+  float Congsuat;
+  float ondac=0;
+  long retardo=millis();
+  int s=0;
+  while(millis()-retardo<500)
+  {
+    sensor = analogRead(pinSCT) * (1.115 / 1023.0);
+    Dongdien=sensor*0.4;
+    ondac=ondac+sq(Dongdien);
+    s=s+1;
+    delay(1);
+  }
+  ondac=ondac*2;
+  Dongdien=sqrt((ondac)/s);
+  Congsuat=Dongdien*230.0;
+  Serial.println(String("Dong Dien: ") + (String)Dongdien + String("A   Cong suat: ") + (String)Congsuat + String("W"));
+  char I[10],W[10],IW[20];
+  String W1,I1;
+  W1 = (String)Congsuat;
+  W1.toCharArray(W,W1.length()+1);
+  I1 = (String)Dongdien;
+  I1.toCharArray(I,I1.length()+1);
+  sprintf(IW,"%sA  ,%sW",I,W);
+  client.publish("YHDC100",IW);
 }

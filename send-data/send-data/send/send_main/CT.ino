@@ -102,7 +102,9 @@ void MQTTreconnect()
             client.subscribe("ac2");
             client.subscribe("tds_sub");
             client.subscribe("yhdc_sub");
+            client.subscribe("ds18b20_sub");
             client.publish("caytrong","cay_trong");
+            client.publish("status","không có thông báo mới");
           }
         else 
           {
@@ -237,6 +239,7 @@ void callback(char* topic, byte* message, unsigned int length)
           {
             tds();
             Serial.print(F(" đã gửi tds"));
+            client.publish("status","Đã gửi TDS lên !"); 
           }
       }// end if
       if((String)topic=="yhdc_sub")
@@ -246,7 +249,18 @@ void callback(char* topic, byte* message, unsigned int length)
           {
             YHDC100();
             Serial.print(F(" đã gửi YHDC"));
+            client.publish("status","Đã gửi YHDC lên !"); 
           }
+      }// end if
+      if((String)topic=="ds18b20_sub")
+      {
+        if(messageTemp == "ds18b20_on")
+        {
+          Serial.print(F("\nGửi yêu cầu gửi ds18b20_1: "));
+          multi_ds18b20();
+          client.publish("status","Đã gửi nhiệt độ lên !");      
+        }
+
       }// end if
     Serial.println();
   }// end callback

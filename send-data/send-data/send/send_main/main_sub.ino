@@ -39,8 +39,6 @@ void init_startup()
     digitalWrite(44,LOW);
     digitalWrite(46,LOW);
     digitalWrite(48,LOW);
-    // dùng cho cảm biến dòng
-    emon.current(A0, 60.6); 
     // dùng cho rtc
     Wire.begin();
     if (! rtc.begin()) {  Serial.print("Không tìm thấy RTC"); lcd.clear();  lcd.print("Không tìm thấy RTC");}
@@ -58,7 +56,6 @@ void init_send_once()
 {
   while((Ethernet.linkStatus()!=LinkON) || (!client.connected()) )
   {
-    Serial.println(F("kiem tra ket noi void setup"));
     if(Ethernet.linkStatus()!=LinkON)    {   ethernet();       }
     if(!client.connected())              {   MQTTreconnect();  }
     if(!client.loop())                   {   client.connect("arduinoClient"); }
@@ -80,20 +77,24 @@ void send_ar()
   lcd.setCursor(0,1);
   lcd.print("reset board 12h");
   delay(20000);
-  client.publish("arduino","arduino taking a rest");
+  client.publish("arduino","arduino taking a rest 1");
   delay(10000);
-  client.publish("arduino","arduino taking a rest");
+  client.publish("arduino","arduino taking a rest 2");
   delay(15000);
-  client.publish("arduino","arduino taking a rest");
+  client.publish("arduino","arduino taking a rest 3");
   delay(1000);
   resetFunc();
 }
 
 void ar_other()
 {
-  char ar[50];
-  sprintf(ar,"Arduino Active %d",count_ar++);
-  client.publish("arduino",ar);
+  if((millis()-tar)>=5001)
+  {
+    char ar[50];
+    sprintf(ar,"Active [ %d ]",count_ar++);
+    client.publish("arduino",ar);
+    tar = millis();
+  }
   if(count_ar>=250)
   {
     count_ar=0;
