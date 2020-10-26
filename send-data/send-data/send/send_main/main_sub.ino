@@ -2,34 +2,8 @@
 void init_startup()
 {
   Serial.begin(9600);
-  // khoi tao lcd
-  start_lcd();
-  // dùng cho ds18b20
-  sensors_ds.begin();
-  delay(10);
-  deviceCount = sensors_ds.getDeviceCount();
-  sprintf(extra,"\nĐang tìm ds18b20...tìm thấy: %d device",deviceCount);
-  Serial.println(extra);
-  // dùng cho rtc
-  if(!rtc.begin())
-  {Serial.print("Không tìm thấy RTC");}
-  else
-  {Serial.print("RTC Đã bắt đầu...");}
-  Serial.println("RTC");
-  if(!rtc.isrunning())
-  {Serial.print("RTC không hoạt động\n");}
-  else
-  {Serial.println("RTC đang hoạt Động");}
-// ------------- Set thoi gian ------------------------------
-//    rtc.adjust(DateTime(2020, 10, 10, 8, 28, 0));
-//    rtc.adjust(DateTime(F(__DATE__), F(__TIME__)));
-  // lệnh cho TDS
-  gravityTds.setPin(TdsSensorPin);
-  gravityTds.setAref(5.0);  //reference voltage on ADC, default 5.0V on Arduino UNO
-  gravityTds.setAdcRange(1024);  //1024 for 10bit ADC;4096 for 12bit ADC
-  gravityTds.begin();  //initialization
   // khai báo chân
-//  pinMode(TdsSensorPin,INPUT);
+  pinMode(TdsSensorPin,INPUT);
   pinMode(38, OUTPUT);
   pinMode(40, OUTPUT);
   pinMode(42, OUTPUT);
@@ -43,7 +17,24 @@ void init_startup()
   digitalWrite(44,LOW);
   digitalWrite(46,LOW);
   digitalWrite(48,LOW);
-  Serial.println("end start");
+  start_lcd();
+  // dùng cho ds18b20
+  sensors_ds.begin();
+  delay(10);
+  deviceCount = sensors_ds.getDeviceCount();
+  char extra[50];
+  sprintf(extra,"\nĐang tìm ds18b20...tìm thấy: %d device",deviceCount);
+  Serial.println(extra);
+  // dùng cho rtc
+  if(!rtc.begin() || !rtc.isrunning())  {Serial.print("RTC Không Hoạt Động\n");}  else  {Serial.print("RTC Đã bắt đầu...");}
+// ------------- Set thoi gian ------------------------------
+//    rtc.adjust(DateTime(2020, 10, 10, 8, 28, 0));
+//    rtc.adjust(DateTime(F(__DATE__), F(__TIME__)));
+  // lệnh cho TDS
+  gravityTds.setPin(TdsSensorPin);
+  gravityTds.setAref(5.0);  //reference voltage on ADC, default 5.0V on Arduino UNO
+  gravityTds.setAdcRange(1024);  //1024 for 10bit ADC;4096 for 12bit ADC
+  gravityTds.begin();  //initialization
 }
 
 // ************************* khoi tao ket noi ban dau ************************
@@ -51,7 +42,6 @@ void init_send_once()
 {
   while((Ethernet.linkStatus()!=LinkON) || (!client.connected()) )
   {
-    Serial.println("here");
     if(Ethernet.linkStatus()!=LinkON)    {   ethernet();       }
     if(!client.connected())              {   MQTTreconnect();  }
     delayMicroseconds(500);
@@ -59,7 +49,6 @@ void init_send_once()
     tds();
     YHDC100();
   }
-  Serial.println("end send once");
 }
 
 void send_ar()

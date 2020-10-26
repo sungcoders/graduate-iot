@@ -4,14 +4,14 @@ void ethernet()
 {
   byte i=0;
   Serial.print(F("connecting ethernet :\n"));
-  Ethernet.begin(mac,IP);
+  Ethernet.begin(mac,IP,dns1,gateway,subnetmsk);
   while(Ethernet.linkStatus()!=LinkON)  //https://www.arduino.cc/en/Reference/EthernetLinkStatus
   {
     i++;
     Serial.print(F("Ethernet lỗi - chờ 3s, Lần: "));
     Serial.print(i);
     delay(2000);
-    Ethernet.begin(mac,IP);
+    Ethernet.begin(mac,IP,dns1,gateway,subnetmsk);
     delay(200);
     switch(Ethernet.linkStatus())
     {
@@ -42,9 +42,9 @@ void ethernet()
 void MQTTreconnect()
 {
   int j=0;
-  if (Ethernet.linkStatus() != LinkON) { ethernet(); }
   while(!client.connected())
   {
+    if (Ethernet.linkStatus() != LinkON) { ethernet(); }
     j++;
     Serial.print(F("MQTT kết nối - Lần: "));
     Serial.print(String(j));
@@ -69,7 +69,7 @@ void MQTTreconnect()
     {
       Serial.print(F("\nMQTT thất bại, Thử lại lần nữa - lỗi:"));
       Serial.println(client.state());
-      delay(1000);
+      delay(2000);
     }
     if(j>=15) 
     {
@@ -86,9 +86,9 @@ void callback(char* topic, byte* payload, unsigned int length)
   Serial.print(F("tin nhắn từ ["));
   Serial.print(topic);
   Serial.print(F("] - "));
-  for (byte z = 0; z < length; z++)
+  for (byte i = 0; i < length; i++)
   {
-    Serial.print((char)payload[z]);
+    Serial.print((char)payload[i]);
   }
   switch((char)payload[0])
   {
@@ -128,12 +128,8 @@ void callback(char* topic, byte* payload, unsigned int length)
     case 'f':
       {digitalWrite(44, LOW);   Serial.println("\ttat AC 2"); }
       break;
-    case 'b':
-      {multi_ds18b20(); Serial.print(F("Đã gửi Nhiệt Độ.")); client.publish("status","Đã gửi nhiệt độ lên !"); }
-      break;
-    default:
-      Serial.println("end");
-      break;
+//    case 'b':
+//      {multi_ds18b20(); Serial.print(F("Đã gửi Nhiệt Độ.")); client.publish("status","Đã gửi nhiệt độ lên !"); }
+//      break;
   }
-  Serial.println();
 }

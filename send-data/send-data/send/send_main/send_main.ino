@@ -1,3 +1,4 @@
+#include <Arduino_FreeRTOS.h>
 #include <avr/wdt.h>
 #include <UIPEthernet.h>
 #include <PubSubClient.h>
@@ -18,17 +19,20 @@
           EthernetClient Ethclient;
           PubSubClient client(Ethclient);
 // thông tin kết nối
-const byte        mac[] = { 0x54, 0x34, 0x41, 0x30, 0x30, 0x35 };
-const uint8_t     IP[] = {192, 168, 1, 199};
+const byte        mac[] = {0x54,0x34,0x41,0x30,0x30,0x35};
+const uint8_t     IP[] = {192,168,1,198};
+const uint8_t     dns1[] = {8,8,8,8};
+const uint8_t     gateway[] = {192,168,1,1};
+const uint8_t     subnetmsk[] = {255,255,255,0};
 const char* mqtt_server = "mohinhrauthuycanh.ddns.net";
 const char daysOfTheWeek[7][12] = {"Sunday", "Monday", "Tueday", "Wed", "Thuday", "Friday", "Satuday"};
 // ********************************** khai báo biến ***************************************//
 int   deviceCount;                    // biến nhận số lượng ds18b20
 byte  countMQTT=0, count_ar=0 ;       // biến đếm MQTT
-char  extra[100];                     // biến lưu tạm thời toàn cục
+char cvt_c[50];
+unsigned long ts, tar, t_noti;
 // ********************************** khai báo hàm con ***************************************//
 extern volatile unsigned long timer0_millis;
-unsigned long ts, tar, t_noti;       // ts
 
 void(* resetFunc) (void) = 0;               //cài đặt hàm reset
 void ethernet();
@@ -51,35 +55,34 @@ void setup()
   delayMicroseconds(100);
   client.setServer(mqtt_server, 1883);
   client.setCallback(callback);
-//  init_send_once();
+  init_send_once();
 }
 
 //-----------------------------------------loop---------------------------------
 void loop()
 {
-  wdt_enable(WDTO_4S);
+//  wdt_enable(WDTO_8S);
 //  while((Ethernet.linkStatus()!=LinkON) || (!client.connected()) )
 //  {
-//    Serial.println(F("check EQ in loop"));
-//    if (Ethernet.linkStatus() != LinkON)  { ethernet();         }
-//    if (!client.connected())              { MQTTreconnect();    }
+    if (Ethernet.linkStatus() != LinkON)  { ethernet();         }
+    if (!client.connected())              { MQTTreconnect();    }
 //  }
-//  client.loop();
-  if(millis()-ts>=3000)
+  if(client.loop()) { client.connect("arduinoClient"); }
+  if(millis()-ts>=5000)
   {
     YHDC100();
     tds();
-    Serial.println("ds18b20");
     multi_ds18b20();
     ts=millis();
   }
   if(millis() >= 2592000000) //30 day
   {
+    send_ar();
     delayMicroseconds(500);
     milirst();
   }
-  wdt_disable();
-  delayMicroseconds(100);
+  else  { ar_other(); }
+//  wdt_disable();
 }
 
 void milirst()
@@ -87,4 +90,20 @@ void milirst()
   noInterrupts();
   timer0_millis = 0;
   interrupts();
+}
+
+void convertcharf(float fl1)
+{
+  String fls=(String)fl1;
+  fls.toCharArray(cvt_c,fls.length()+1);
+}
+
+void convertcharfp(float fl1, float fl2)
+{
+  String fls1=(String)fl1;
+  String fls2=(String)fl2;
+  char flc1[15],flc2[15];
+  fls1.toCharArray(flc1,fls1.length()+1);
+  fls2.toCharArray(flc2,fls2.length()+1);
+  sprintf(cvt_c,"%s  ,%s",flc1,flc2);
 }

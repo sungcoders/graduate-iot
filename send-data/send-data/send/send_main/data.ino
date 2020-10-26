@@ -2,12 +2,10 @@
 void multi_ds18b20()
 {
   // gioi han nhiet do
-  int limit_over = 50;
-  int limit_under = 25;
+  float limit_over = 50;
+  float limit_under = 25;
   // khai bao
   float tempC,tempF;                   // gia tri *C va *F
-  char tempc[10],tempf[10];            // cac bien tam thoi *C va *F
-  char dsc[20],dsf[10];                // cac bien luu ket qua cuoi cung
   const char ds18b20[10];              // cac MQTT topic
   sensors_ds.requestTemperatures();    // deviceCount
   for (int i = 0;  i < 8;  i++)
@@ -15,15 +13,9 @@ void multi_ds18b20()
     tempC = sensors_ds.getTempCByIndex(i);
     if(limit_under<=tempC<=limit_over)
     {
-      String tempx=(String)tempC;
-      tempx.toCharArray(tempc,tempx.length()+1);
-      tempF=DallasTemperature::toFahrenheit(tempC);
-      String tempf=(String)tempF;
-      tempf.toCharArray(dsf,tempf.length()+1);
-      sprintf(dsc,"%s*C\t,\t%s*F",tempc,dsf);
-      sprintf(ds18b20,"ds18b20_%d",i+1);
-      client.publish(ds18b20,dsc);
-      Serial.println(dsc);
+      convertcharf(tempC);
+      client.publish(ds18b20,cvt_c);
+      Serial.println(cvt_c);
     }
     else if(tempC<limit_under)
     {
@@ -45,8 +37,19 @@ void multi_ds18b20()
 void rtcds1307()
 {
   DateTime now = rtc.now();
-  Serial.println(String("\n") + (String)now.hour() + ":" + (String)now.minute() + ":" + (String)now.second());
-  Serial.println((String)daysOfTheWeek[now.dayOfTheWeek()] + String(",") + (String)now.day() + "/" + (String)now.month() + "/" + (String)now.year() + String("\n"));
+  if(now.hour()>24 || now.minute()>=60 || now.second()>=60)
+  {
+    Serial.println("Sai Giờ Phút Giây");
+  }
+  else if(now.day()>31 || now.month()>12)
+  {
+    Serial.println("Sai Ngày Tháng");
+  }
+  else
+  {
+    Serial.println(String("\n") + (String)now.hour() + ":" + (String)now.minute() + ":" + (String)now.second());
+    Serial.println((String)daysOfTheWeek[now.dayOfTheWeek()] + String(",") + (String)now.day() + "/" + (String)now.month() + "/" + (String)now.year() + String("\n"));
+  }
 }
 
 void tds()
@@ -73,53 +76,16 @@ void tds()
   }
   else
   {
-    String tds_tmp=(String)sum_tds;
-    char tds_value[10];
-    sprintf(tds_value,"%d ppm",sum_tds);
-    client.publish("TDS_sensor1",tds_value);
-    Serial.print(tds_value);
-    Serial.println();
+    convertcharf(sum_tds);
+    client.publish("TDS_sensor1",cvt_c);
   }
 }
 
-
-//void sd_card()
-//{
-//  f = SD.open("test.txt", FILE_WRITE);
-//  if (f)
-//  {
-//    Serial.print(F("Writing to test.txt..."));
-//    f.println("testing 1, 2, 3.");
-//    f.close();
-//    Serial.println("done.");
-//  }
-//  else
-//  {
-//    Serial.println(F("error opening test.txt"));
-//  }
-//  f = SD.open("test.txt");
-//  if (f)
-//  {
-//    Serial.println("test.txt:");
-//    while (f.available())
-//    {
-//      Serial.write(f.read());
-//    }
-//    f.close();
-//  }
-//  else
-//  {
-//    Serial.println(F("error opening test.txt"));
-//  }
-//}
-
 void YHDC100()
 {
-  Serial.println("khai bao");
   float Dongdien,sensor,Congsuat,ondac=0;
   long retardo=millis();
   int s=0;
-  String W1,I1;
   while(millis()-retardo<500)
   {
     sensor = analogRead(pinSCT) * (1.115 / 1023.0);
@@ -137,11 +103,6 @@ void YHDC100()
   Serial.print("A   Cong suat: ");
   Serial.print(Congsuat);
   Serial.println("W");
-  char I[10],W[10],IW[20];
-  W1 = (String)Congsuat;
-  W1.toCharArray(W,W1.length()+1);
-  I1 =  (String)Dongdien;
-  I1.toCharArray(I,I1.length()+1);
-  sprintf(IW,"%sA  ,%sW",I,W);
-  client.publish("YHDC100",IW);
+  convertcharfp(Congsuat,Dongdien);
+  client.publish("YHDC100",cvt_c);
 }
