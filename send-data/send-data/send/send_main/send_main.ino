@@ -56,34 +56,57 @@ void setup()
   client.setServer(mqtt_server, 1883);
   client.setCallback(callback);
   init_send_once();
-}
+  xTaskCreate([](void *prm) {
+    while(1)
+    {
+      wdt_enable(WDTO_8S);
+      if (!client.connected())              { MQTTreconnect();    }
+//      if(!client.loop()) { client.connect("arduinoClient"); }
+      client.loop();
+      if(millis()-ts>=5000)
+      {
+        Serial.println("tds");
+        tds();
+        Serial.println("yhdc");
+        YHDC100();
+//        multi_ds18b20();
+        Serial.println("millis");
+        ts=millis();
+      }
+      if(millis() >= 2592000000) //30 day
+      {
+        send_ar();
+        delayMicroseconds(500);
+        milirst();
+      }
+      else  { ar_other(); }
+      wdt_disable();
+    }
+  },
+  "ct2",
+  2500,
+  NULL,
+  2,
+  NULL);
+  xTaskCreate([](void *prm) {
+    while(1)
+    {
+      if (!client.connected())              { MQTTreconnect();    }
+      client.loop();
+    }
+  },
+  "ct1",
+  1024,
+  NULL,
+  1,
+  NULL);
+} // end setup
 
 //-----------------------------------------loop---------------------------------
 void loop()
 {
-//  wdt_enable(WDTO_8S);
-//  while((Ethernet.linkStatus()!=LinkON) || (!client.connected()) )
-//  {
-    if (Ethernet.linkStatus() != LinkON)  { ethernet();         }
-    if (!client.connected())              { MQTTreconnect();    }
-//  }
-  if(client.loop()) { client.connect("arduinoClient"); }
-  if(millis()-ts>=5000)
-  {
-    YHDC100();
-    tds();
-    multi_ds18b20();
-    ts=millis();
-  }
-  if(millis() >= 2592000000) //30 day
-  {
-    send_ar();
-    delayMicroseconds(500);
-    milirst();
-  }
-  else  { ar_other(); }
-//  wdt_disable();
-}
+  
+} // end loop
 
 void milirst()
 {

@@ -15,7 +15,7 @@ void multi_ds18b20()
     {
       convertcharf(tempC);
       client.publish(ds18b20,cvt_c);
-      Serial.println(cvt_c);
+//      Serial.println(cvt_c);
     }
     else if(tempC<limit_under)
     {
@@ -92,9 +92,7 @@ void YHDC100()
     Dongdien=sensor*0.4;
     ondac=ondac+sq(Dongdien);
     s=s+1;
-    delay(1);
   }
-  delay(1);
   ondac=ondac*2.0;
   Dongdien=sqrt((ondac)/s);
   Congsuat=Dongdien*230.0;
