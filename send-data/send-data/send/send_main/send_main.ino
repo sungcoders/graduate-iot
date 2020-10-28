@@ -28,7 +28,7 @@ const char* mqtt_server = "mohinhrauthuycanh.ddns.net";
 const char daysOfTheWeek[7][12] = {"Sunday", "Monday", "Tueday", "Wed", "Thuday", "Friday", "Satuday"};
 // ********************************** khai báo biến ***************************************//
 int   deviceCount;                    // biến nhận số lượng ds18b20
-byte  countMQTT=0, count_ar=0 ;       // biến đếm MQTT
+byte  count_ar=0 ;                    // biến thời gian
 char cvt_c[50];
 unsigned long ts, tar, t_noti;
 // ********************************** khai báo hàm con ***************************************//
@@ -69,7 +69,7 @@ void setup()
         tds();
         Serial.println("yhdc");
         YHDC100();
-//        multi_ds18b20();
+        ds18b20(1);
         Serial.println("millis");
         ts=millis();
       }

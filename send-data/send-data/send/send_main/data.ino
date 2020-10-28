@@ -33,6 +33,40 @@ void multi_ds18b20()
   }
 }
 
+void ds18b20(int ds)
+{
+  // gioi han nhiet do
+  float limit_over = 50;
+  float limit_under = 25;
+  // khai bao
+  float tempC;
+  const char ds18b20[10];          // cac MQTT topic
+  if(deviceCount>0)
+  {
+    if(ds<deviceCount)
+    {
+      sensors_ds.requestTemperatures();
+      tempC = sensors_ds.getTempCByIndex(ds);
+      if(limit_under<=tempC<=limit_over)
+      {
+        convertcharf(tempC);
+        client.publish(ds18b20,cvt_c);
+      //  Serial.println(cvt_c);
+      }
+      else if(tempC<limit_under)
+      {
+        client.publish(ds18b20[ds],"nhiet do qua thap");
+        Serial.println(F("nhiet do qua thap"));
+      }
+      else
+      {
+        client.publish(ds18b20[ds],"nhiet do qua cao");
+        Serial.println(F("nhiet do qua cao"));
+      }
+    } 
+  }
+}
+
 // ---------------------- RTC-----------------------------
 void rtcds1307()
 {
