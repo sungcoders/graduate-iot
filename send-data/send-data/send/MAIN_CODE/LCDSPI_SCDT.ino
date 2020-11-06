@@ -86,3 +86,16 @@ void lcd_print(uint8_t x, uint8_t y, String str)
   lcd_gotoxy(x, y);
   lcd_puts(ctstr);
 }
+
+void lcd_int(uint8_t x, uint8_t y, int in)
+{
+  char ct[10];
+  String stri=(String)in;
+  stri.toCharArray(ct,stri.length()+1);
+  lcd_gotoxy(x,y);
+  lcd_puts(ct);
+}
+void lcd_hello(int deviceCount)
+{
+  lcd_print(10,0,"Hello World");
+}
