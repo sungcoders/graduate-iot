@@ -101,40 +101,40 @@ void callback(char* topic, byte* payload, unsigned int length)
   switch((char)payload[0])
   {
     case 'p':
-      {digitalWrite(8, HIGH);  Serial.println(F("\tbat van 1")); lcd_print(6,4,"on van1");} // relay 1 8
+      {digitalWrite(8, LOW);  Serial.println(F("\tbat van 1")); lcd_print(6,4,"on van1");} // relay 1 8
       break;
     case 'l':
-      {digitalWrite(8, LOW);  Serial.println(F("\ttat van 1"));  lcd_print(6,4,"off van1");}
+      {digitalWrite(8, HIGH);  Serial.println(F("\ttat van 1"));  lcd_print(6,4,"off van1");}
       break;
     case 'o':
-      {digitalWrite(9, HIGH);  Serial.println(F("\tbat van 2")); lcd_print(6,4,"on van2");}  // relay 2 9
+      {digitalWrite(9, LOW);  Serial.println(F("\tbat van 2")); lcd_print(6,4,"on van2");}  // relay 2 9
       break;
     case 'k':
-      {digitalWrite(9, LOW);  Serial.println(F("\ttat van 2")); lcd_print(6,4,"off van2");}  // relay 3 10
+      {digitalWrite(9, HIGH);  Serial.println(F("\ttat van 2")); lcd_print(6,4,"off van2");}  // relay 3 10
       break;
     case 'i':
-      {digitalWrite(10, HIGH);   Serial.println(F("\tbat DC 1")); lcd_print(6,4,"on dc1  ");} // relay 4 11
+      {digitalWrite(10, LOW);   Serial.println(F("\tbat DC 1")); lcd_print(6,4,"on dc1  ");} // relay 4 11
       break;
     case 'j':
-      {digitalWrite(10, LOW);   Serial.println(F("\ttat DC 1"));  lcd_print(6,4,"off dc1  ");}  // relay 5 12
+      {digitalWrite(10, HIGH);   Serial.println(F("\ttat DC 1"));  lcd_print(6,4,"off dc1  ");}  // relay 5 12
       break;
     case 'u':
-      {digitalWrite(11, HIGH);   Serial.println(F("\tbat DC 2")); lcd_print(6,4,"on dc2  ");}   // relay 6 7
+      {digitalWrite(11, LOW);   Serial.println(F("\tbat DC 2")); lcd_print(6,4,"on dc2  ");}   // relay 6 7
       break;
     case 'h':
-      {digitalWrite(11, LOW);   Serial.println(F("\ttat DC 2")); lcd_print(6,4,"off dc2  ");}   // relay 7 6
+      {digitalWrite(11, HIGH);   Serial.println(F("\ttat DC 2")); lcd_print(6,4,"off dc2  ");}   // relay 7 6
       break;
     case 'y':
-      {digitalWrite(12, HIGH);   Serial.println(F("\tbat AC 1")); lcd_print(6,4,"on ac1  ");}
+      {digitalWrite(12, LOW);   Serial.println(F("\tbat AC 1")); lcd_print(6,4,"on ac1  ");}
       break;
     case 'g':
-      {digitalWrite(12, LOW);   Serial.println(F("\ttat AC 1")); lcd_print(6,4,"off ac1  ");}
+      {digitalWrite(12, HIGH);   Serial.println(F("\ttat AC 1")); lcd_print(6,4,"off ac1  ");}
       break;
     case 't':
-      {digitalWrite(6, HIGH);   Serial.println(F("\tbat AC 2")); lcd_print(6,4,"on ac2  ");}
+      {digitalWrite(6, LOW);   Serial.println(F("\tbat AC 2")); lcd_print(6,4,"on ac2  ");}
       break;
     case 'f':
-      {digitalWrite(6, LOW);   Serial.println(F("\ttat AC 2")); lcd_print(6,4,"off ac2  ");}
+      {digitalWrite(6, HIGH);   Serial.println(F("\ttat AC 2")); lcd_print(6,4,"off ac2  ");}
       break;
 //    case 'b':
 //      {multi_ds18b20(); Serial.print(F("Đã gửi Nhiệt Độ.")); client.publish("status","Đã gửi nhiệt độ lên !"); }

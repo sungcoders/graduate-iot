@@ -72,11 +72,6 @@ void loop()
     YHDC30();
     t3=millis();
   }
-//  if(millis()-t4>=30000)
-//  {
-//    lcd_clear();
-//    t4=millis();
-//  }
   if(millis() >= 2592000000) //30 day
   {
     delayMicroseconds(500);

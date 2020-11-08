@@ -11,22 +11,23 @@ float ds18b20(int ds)
   {
     if((ds-1)<deviceCount)
     {
+      sprintf(ds18b20,"ds18b20_%d",ds);
       sensors_ds.requestTemperatures();
       tempC = sensors_ds.getTempCByIndex(ds-1);
       if(limit_under<=tempC<=limit_over)
       {
         convertcharf(tempC);
         client.publish(ds18b20,cvt_c);
-      //  Serial.println(cvt_c);
+        Serial.println(ds18b20);
       }
       else if(tempC<limit_under)
       {
-        client.publish(ds18b20[ds],"nhiet do qua thap");
+        client.publish(ds18b20,"nhiet do qua thap");
         Serial.println(F("nhiet do qua thap"));
       }
       else
       {
-        client.publish(ds18b20[ds],"nhiet do qua cao");
+        client.publish(ds18b20,"nhiet do qua cao");
         Serial.println(F("nhiet do qua cao"));
       }
       if(ds==1)

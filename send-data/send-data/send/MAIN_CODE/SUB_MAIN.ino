@@ -19,19 +19,20 @@ void init_startup()
   dht.begin();
   // khai báo chân
   pinMode(TdsPin,INPUT);
-  pinMode(38, OUTPUT);
-  pinMode(40, OUTPUT);
-  pinMode(42, OUTPUT);
-  pinMode(44, OUTPUT);
-  pinMode(46, OUTPUT);
-  pinMode(48, OUTPUT);
-  pinMode(13, OUTPUT);
-  digitalWrite(38,LOW);
-  digitalWrite(40,LOW);
-  digitalWrite(42,LOW);
-  digitalWrite(44,LOW);
-  digitalWrite(46,LOW);
-  digitalWrite(48,LOW);
+  pinMode(8, OUTPUT);
+  pinMode(9, OUTPUT);
+  pinMode(10, OUTPUT);
+  pinMode(11, OUTPUT);
+  pinMode(12, OUTPUT);
+  pinMode(6, OUTPUT);
+  pinMode(7, OUTPUT);
+  digitalWrite(8,HIGH);
+  digitalWrite(9,HIGH);
+  digitalWrite(10,HIGH);
+  digitalWrite(11,HIGH);
+  digitalWrite(12,HIGH);
+  digitalWrite(6,HIGH);
+  digitalWrite(7,HIGH);
   start_lcd();
   check_ds18b20();
   if(check_rtc()==1) {Serial.println(F("RTC Đang hoạt động.")); lcd_print(0,0,"      RTC not run    ");} else {Serial.println(F("RTC failed!"));}
