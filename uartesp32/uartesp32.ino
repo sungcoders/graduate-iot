@@ -20,6 +20,15 @@ PubSubClient client(espClient);
 String a,b;
 unsigned long t2,t3,t4,t5;
 int espcount=0;
+extern volatile unsigned long timer0_millis;
+
+void milirst()
+{
+  noInterrupts();
+  timer0_millis = 0;
+  interrupts();
+}
+
 void setup()
 {
   Serial.begin(9600);
@@ -34,6 +43,7 @@ void setup()
     WiFiManager wifiManager;
     wifiManager.autoConnect(ssidname,ssidpass);
   }
+  Serial.println("WIFI CONNECTED");
   client.setServer(mqtt_server, 1883);
   client.setCallback(callback);
 }
@@ -60,8 +70,8 @@ void loop()
       if(a=="MEGA2560")
       {
         Serial.println("MEGA đang hoạt động");
-        t4=millis();
         a="";
+        client.publish("esp32v1","Mega OK");
         digitalWrite(4,HIGH);
         digitalWrite(2,HIGH);
         delay(500);
@@ -70,6 +80,8 @@ void loop()
         digitalWrite(2,HIGH);
         delay(500);
         digitalWrite(2,LOW);
+        t4=millis();
+
       }
       else
       {
@@ -77,9 +89,14 @@ void loop()
         espcount +=1;
         if(espcount>=4)
         {
+          client.publish("esp32v2","relay on");
           digitalWrite(4,LOW);
-          delay(30000);
           Serial.println("da bat relay");
+          Serial.println(a);
+          delay(30000);
+          digitalWrite(4,HIGH);
+          Serial.println("da tat relay");
+          client.publish("esp32v2","relay off");
           espcount=0;
         }
         a="";
@@ -93,17 +110,22 @@ void loop()
   {
     while (Serial2.available()==0)
     {
-      digitalWrite(12,LOW);
+      digitalWrite(4,LOW);
+      client.publish("esp32v2","relay on");
+      Serial.println("da bat relay 1");
       delay(30000); // 30s
-      Serial.println("da bat relay");
+      digitalWrite(4,HIGH);
+      client.publish("esp32v2","relay off 1");
+      Serial.println("da off relay1");
+    t4=millis();
+    break;
     }
     t4=millis();
   }
-  if(millis()-t5>30000) // 1phut
+  if(millis()-t5>60000) // 1phut
   {
     Serial2.write("ESP32");
-    Serial.println("da gui esp32");
+    Serial.println("i am here");
     t5=millis();
   }
-  
 }
