@@ -1,12 +1,14 @@
-#include <WiFiManager.h>
+//#include <WiFiManager.h>
 #include <WiFi.h>
 #include <PubSubClient.h>
 
 #define RXD2 16
 #define TXD2 17
+#define ssid "Sensor LAB"
+#define pass "sensor2020"
 
-char const* ssidname ="ESP32_WFCNF";
-char const* ssidpass ="12345678";
+//char const* ssidname ="ESP32_WFCNF";
+//char const* ssidpass ="12345678";
 const char* mqtt_server = "mohinhrauthuycanh.ddns.net";
 IPAddress staticIP(192,168,1,146);
 IPAddress gateway(192,168,1,1);
@@ -37,13 +39,8 @@ void setup()
   pinMode(4,OUTPUT);
   digitalWrite(4,HIGH);
   WiFi.config(staticIP,gateway,subnet,dns1,dns2);
-  while(WiFi.waitForConnectResult() != WL_CONNECTED)
-  {
-    digitalWrite(2,LOW);
-    WiFiManager wifiManager;
-    wifiManager.autoConnect(ssidname,ssidpass);
-  }
-  Serial.println("WIFI CONNECTED");
+  WiFi.begin(ssid,pass);
+  wifi();
   client.setServer(mqtt_server, 1883);
   client.setCallback(callback);
 }
@@ -53,8 +50,8 @@ void loop()
   while(WiFi.waitForConnectResult() != WL_CONNECTED)
   {
     digitalWrite(2,LOW);
-    WiFiManager wifiManager;
-    wifiManager.autoConnect(ssidname,ssidpass);
+//    WiFiManager wifiManager;
+//    wifiManager.autoConnect(ssidname,ssidpass);
     digitalWrite(2,HIGH);
   }
   if (!client.connected())  { reconnect(); }
@@ -128,4 +125,18 @@ void loop()
     Serial.println("i am here");
     t5=millis();
   }
+}
+
+void wifi()
+{
+  WiFi.begin(ssid,pass);
+  while(WiFi.waitForConnectResult() != WL_CONNECTED)
+  {
+    digitalWrite(2,LOW);
+    delay(500);
+    Serial.print(".");
+//    WiFiManager wifiManager;
+//    wifiManager.autoConnect(ssidname,ssidpass);
+  }
+  Serial.println("WIFI CONNECTED");
 }
