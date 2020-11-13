@@ -1,10 +1,10 @@
 #ifndef LCDSPI_SCDT_H
 #define LCDSPI_SCDT_H
 // set reset - 3,3v
-#define CS   43//49//10 //Chon chip - cs lcd 
-#define SDA  45//47//11 //Data SPI  - sdi lcd
-#define CD   47//45//12 //Chot du lieu Command va Data (C/D)  - a0 lcd
-#define SCK  49//43//13 //Clock SPI  - sclk lcd
+#define CS   43   //Chon chip - cs lcd 
+#define SDA  45   //Data SPI  - sdi lcd
+#define CD   47   //Chot du lieu Command va Data (C/D)  - a0 lcd
+#define SCK  49   //Clock SPI  - sclk lcd
 
 void lcd_init(void);
 void lcd_puts(char *s);

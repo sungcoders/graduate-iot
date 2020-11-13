@@ -1,8 +1,9 @@
+
 byte buff[2];
 
-uint16_t BH1750_display()
+int BH1750_display()
 {
-  uint16_t val=0;
+  int val=0;
   BH1750_Init(0x23);
   if(2==BH1750_Read(0x23))
   {
@@ -11,10 +12,12 @@ uint16_t BH1750_display()
     Serial.println("lux");
     lcd_print(0,2,"Anh sang:       lux");
     lcd_number(10,2,val);
+    client.publish("BH1750_1",num_to_char(val," lux"));
   }
   else
   {
     lcd_print(0,2,"Anh sang: fail  lux");
+    client.publish("BH1750_1","fail  lux");
   }
   return (val);
 }
@@ -24,7 +27,7 @@ int BH1750_Read(int address)
   int i=0;
   Wire.beginTransmission(address);
   Wire.requestFrom(address, 2);
-  while(Wire.available()) //
+  while(Wire.available())
   {
     buff[i] = Wire.read();  // receive one byte
     i++;

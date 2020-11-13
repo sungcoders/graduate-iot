@@ -95,7 +95,3 @@ void lcd_int(uint8_t x, uint8_t y, int in)
   lcd_gotoxy(x,y);
   lcd_puts(ct);
 }
-void lcd_hello(int deviceCount)
-{
-  lcd_print(10,0,"Hello World");
-}

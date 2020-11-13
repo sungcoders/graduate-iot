@@ -22,7 +22,7 @@ int d2b(byte num) { return ((num/10*16) + (num%10)); }
 
 void rtc_display()
 {
-  sprintf(tg,"%dh:%dp:%d_%d/%d/%d",gio,phut,giay,ngay,thang,nam);
+  sprintf(tg,"%dh:%dp _ %d/%d/%d",gio,phut,ngay,thang,nam);
   lcd_print(0,0,tg);
   Serial.println(tg);
 }
