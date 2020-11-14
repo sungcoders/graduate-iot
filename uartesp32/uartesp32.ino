@@ -1,14 +1,12 @@
-//#include <WiFiManager.h>
 #include <WiFi.h>
 #include <PubSubClient.h>
 
 #define RXD2 16
 #define TXD2 17
+#define TIME1 1000
 #define ssid "Sensor LAB"
 #define pass "sensor2020"
 
-//char const* ssidname ="ESP32_WFCNF";
-//char const* ssidpass ="12345678";
 const char* mqtt_server = "mohinhrauthuycanh.ddns.net";
 IPAddress staticIP(192,168,1,146);
 IPAddress gateway(192,168,1,1);
@@ -19,9 +17,8 @@ IPAddress dns2(8,8,4,4);
 WiFiClient espClient;
 PubSubClient client(espClient);
 
-String a,b;
-unsigned long t2,t3,t4,t5;
-int espcount=0;
+unsigned long t4,t5;
+uint8_t espcount=0;
 extern volatile unsigned long timer0_millis;
 
 void milirst()
@@ -39,7 +36,6 @@ void setup()
   pinMode(4,OUTPUT);
   digitalWrite(4,HIGH);
   WiFi.config(staticIP,gateway,subnet,dns1,dns2);
-  WiFi.begin(ssid,pass);
   wifi();
   client.setServer(mqtt_server, 1883);
   client.setCallback(callback);
@@ -47,15 +43,15 @@ void setup()
 
 void loop()
 {
-  while(WiFi.waitForConnectResult() != WL_CONNECTED)
-  {
-    digitalWrite(2,LOW);
-//    WiFiManager wifiManager;
-//    wifiManager.autoConnect(ssidname,ssidpass);
-    digitalWrite(2,HIGH);
-  }
-  if (!client.connected())  { reconnect(); }
-  client.loop();
+  (!client.connected())?reconnect():client.loop();
+  uart_receive();
+  uart_check();
+  uart_send();
+}
+
+void uart_receive()
+{
+  String a;
   while (Serial2.available()>0)
   {
     a += char(Serial2.read());
@@ -103,7 +99,21 @@ void loop()
     delay(5);
     Serial.print(".");
   }
-  if(millis()-t4>300000) // 5phut
+}
+
+void uart_send()
+{
+  if(millis()-t5>TIME1*60) // 1phut
+  {
+    Serial2.write("ESP32");
+    Serial.println("i am here");
+    t5=millis();
+  }  
+}
+
+void uart_check()
+{
+  if(millis()-t4>TIME1*300) // 5phut
   {
     while (Serial2.available()==0)
     {
@@ -119,24 +129,4 @@ void loop()
     }
     t4=millis();
   }
-  if(millis()-t5>60000) // 1phut
-  {
-    Serial2.write("ESP32");
-    Serial.println("i am here");
-    t5=millis();
-  }
-}
-
-void wifi()
-{
-  WiFi.begin(ssid,pass);
-  while(WiFi.waitForConnectResult() != WL_CONNECTED)
-  {
-    digitalWrite(2,LOW);
-    delay(500);
-    Serial.print(".");
-//    WiFiManager wifiManager;
-//    wifiManager.autoConnect(ssidname,ssidpass);
-  }
-  Serial.println("WIFI CONNECTED");
 }

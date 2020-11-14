@@ -1,6 +1,21 @@
-
-void reconnect()
+boolean wifi()
 {
+  WiFi.begin(ssid,pass);
+  while(WiFi.waitForConnectResult() != WL_CONNECTED)
+  {
+    digitalWrite(2,LOW);
+    delay(500);
+    Serial.print(".");
+    return false;
+  }
+  digitalWrite(2,HIGH);
+  Serial.println("WIFI CONNECTED");
+  return true;
+}
+
+boolean reconnect()
+{
+  if(WiFi.waitForConnectResult() != WL_CONNECTED) {wifi();}
   while (!client.connected())
   {
     Serial.print("MQTT again...");
@@ -9,6 +24,7 @@ void reconnect()
       Serial.println(F("MQTT Connected"));
       client.publish("outTopic", "hello world");
       client.subscribe("inTopic");
+      return false;
     }
     else
     {
@@ -16,6 +32,7 @@ void reconnect()
       Serial.print(client.state());
       Serial.println(F(" try again..."));
       delay(5000);
+      return true;
     }
   }
 }
