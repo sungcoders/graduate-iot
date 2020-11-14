@@ -42,7 +42,7 @@ void ethernet()
   Serial.println(Ethernet.localIP());
 } //end ethetnet
 
-void MQTTreconnect()
+boolean MQTTreconnect()
 {
   int j=0;
   while(!client.connected())

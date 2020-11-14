@@ -63,28 +63,26 @@ float DHT_read()
   return h,t;
 }
 
-float readTds()
-{
+void readTdsQuick() {
+  analogReference(DEFAULT);
   float aref = 5.0;
-  float rawEc, ec = 0.0;
-  float temperatureCoefficient;
+  float ec = 0.0;
   float tds = 0.0;
   float waterTemp = 0.0;
   float ecCalibration = 1; // hieu chuan
-  waterTemp = ds18b20(1);
-  rawEc = analogRead(TdsPin) * aref / 1024.0; // doc tinh hieu tuong tu chuyen sang dien ap
-  temperatureCoefficient = 1.0 + 0.02 * (waterTemp - 25.0); // cong thuc bu nhiet do : nhiet do chuan 25C = t(hientai)/(1+0.02)*(t(hientai)-25C) 
+  waterTemp = 25.0;//dallasTemperature.getTempCByIndex(0);
+  float rawEc = analogRead(A8) * aref / 1024.0; // doc tinh hieu tuong tu chuyen sang dien ap
+  float temperatureCoefficient = 1.0 + 0.02 * (waterTemp - 25.0); // cong thuc bu nhiet do : nhiet do chuan 25C = t(hientai)/(1+0.02)*(t(hientai)-25C) 
   ec = (rawEc / temperatureCoefficient) * ecCalibration; // hieu chuan ec bu tru nhiet do
   tds = (133.42 * pow(ec, 3) - 255.86 * ec * ec + 857.39 * ec) * 0.5; // chuyen gia tri dien ap thanh tds
   client.publish("TDS_sensor1",float_to_char(tds," ppm"));
   Serial.print(F("TDS:")); Serial.println(tds);
-  Serial.print(F("EC:")); Serial.println(ec, 2);
+  Serial.print(F("EC:")); Serial.println(ec);
   Serial.print(F("Temperature:")); Serial.println(waterTemp);
   lcd_print(0,3,"TDS:");
   lcd_number(4,3,tds);
   lcd_number(14,3,waterTemp);
   lcd_print(19,3,"*C");
-  return (tds);
 }
 
 float get_corriente()

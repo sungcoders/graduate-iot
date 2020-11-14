@@ -6,7 +6,6 @@
 #include <Wire.h>
 #include "DHT.h"
 #include "LCDSPI_SCDT.h"
-#define   TdsPin A8
 #define   TIME1 1000
 #define   TIMEONEDAY  86400
           OneWire onewire(37);
@@ -45,9 +44,8 @@ void setup(void)
 void loop(void)
 {
   wdt_enable(WDTO_8S);
-  if(!client.connected()) { MQTTreconnect();}
-  client.loop();
-  if(millis()-t1>=TIME1)
+  (!client.connected())?MQTTreconnect():client.loop();
+  if((millis()-t1)>=TIME1)
   {
     (check_rtc()==1)?read_rtc(),rtc_display():lcd_print(0,0,"      RTC not run    ");
     BH1750_display();
@@ -58,7 +56,7 @@ void loop(void)
   }
   if(millis()-t3>=TIME1*3)
   {
-    readTds();
+    readTdsQuick();
     YHDC30();
     t3=millis();
   }

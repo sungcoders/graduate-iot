@@ -26,7 +26,6 @@ void init_startup()
   Serial2.begin(9600);
   Wire.begin();
   dht.begin();
-  pinMode(TdsPin,INPUT);
   SetPinOut();
   start_lcd();
   check_ds18b20();
@@ -44,7 +43,7 @@ void init_send_once()
     if(Ethernet.linkStatus()!=LinkON)    {   ethernet();       }
     if(!client.connected())              {   MQTTreconnect();  }
     delayMicroseconds(500);
-    readTds();
+    readTdsQuick();
     YHDC30();
   }
 }
