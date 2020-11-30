@@ -3,7 +3,8 @@
 
 #define RXD2 16
 #define TXD2 17
-#define TIME1 1000
+#define TIME1   1000
+#define TIME5P  300000
 #define ssid "Sensor LAB"
 #define pass "sensor2020"
 
@@ -35,15 +36,15 @@ void setup()
   pinMode(2,OUTPUT);
   pinMode(4,OUTPUT);
   digitalWrite(4,HIGH);
-  WiFi.config(staticIP,gateway,subnet,dns1,dns2);
-  wifi();
-  client.setServer(mqtt_server, 1883);
-  client.setCallback(callback);
+//  WiFi.config(staticIP,gateway,subnet,dns1,dns2);
+//  wifi();
+//  client.setServer(mqtt_server, 1883);
+//  client.setCallback(callback);
 }
 
 void loop()
 {
-  (!client.connected())?reconnect():client.loop();
+//  (!client.connected())?reconnect():client.loop();
   uart_receive();
   uart_check();
   uart_send();
@@ -64,7 +65,7 @@ void uart_receive()
       {
         Serial.println("MEGA đang hoạt động");
         a="";
-        client.publish("esp32v1","Mega OK");
+//        client.publish("esp32v1","Mega OK");
         digitalWrite(4,HIGH);
         digitalWrite(2,HIGH);
         delay(500);
@@ -82,14 +83,14 @@ void uart_receive()
         espcount +=1;
         if(espcount>=4)
         {
-          client.publish("esp32v2","relay on");
+//          client.publish("esp32v2","relay on");
           digitalWrite(4,LOW);
           Serial.println("da bat relay");
           Serial.println(a);
           delay(30000);
           digitalWrite(4,HIGH);
           Serial.println("da tat relay");
-          client.publish("esp32v2","relay off");
+//          client.publish("esp32v2","relay off");
           espcount=0;
         }
         a="";
@@ -118,11 +119,11 @@ void uart_check()
     while (Serial2.available()==0)
     {
       digitalWrite(4,LOW);
-      client.publish("esp32v2","relay on");
+//      client.publish("esp32v2","relay on");
       Serial.println("da bat relay 1");
       delay(30000); // 30s
       digitalWrite(4,HIGH);
-      client.publish("esp32v2","relay off 1");
+//      client.publish("esp32v2","relay off 1");
       Serial.println("da off relay1");
     t4=millis();
     break;
