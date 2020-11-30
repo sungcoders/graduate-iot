@@ -5,43 +5,40 @@ int check_ds18b20()
   sensors_ds.begin();
   delay(10);
   deviceCount = sensors_ds.getDeviceCount();
-  //Serial.print(F("\nĐang tìm ds18b20...tìm thấy: "));
-  //Serial.print(deviceCount);
-  //Serial.println(F("device"));
   return (deviceCount);
 }
 
 void SetPinOut()
 {
-  for(int i=0; i<7; i++)
+  for (int i = 0; i < 7; i++)
   {
-    pinMode(pinout[i],OUTPUT);
-    digitalWrite(pinout[i],HIGH);
+    pinMode(pinout[i], OUTPUT);
+    digitalWrite(pinout[i], HIGH);
   }
 }
 
 void init_startup()
 {
-  Serial.begin(9600);
   Serial2.begin(9600);
   Wire.begin();
   dht.begin();
   SetPinOut();
   start_lcd();
   check_ds18b20();
-  (check_rtc()==1)?lcd_print(0,0,"      RTC run ok     "):lcd_print(0,0,"      RTC not run    ");
-//  set_time(10,28,50,15,11,0,4);
+  (check_rtc() == 1) ? lcd_print(0, 0, "      RTC run ok     ") : lcd_print(0, 0, "      RTC not run    ");
+  //  set_time(10,28,50,15,11,0,4);
   read_rtc();
   rtc_display();
-  lcd_print(19,4,"*C:");
+  lcd_print(19, 4, "*C:");
 }
 
 void init_send_once()
 {
-  while((Ethernet.linkStatus()!=LinkON) || (!client.connected()) )
+  while ((Ethernet.linkStatus() != LinkON) || (!client.connected()) )
   {
-    (!client.connected())?MQTTreconnect():client.loop();
+    (!client.connected()) ? MQTTreconnect() : client.loop();
     delayMicroseconds(500);
+    BH1750_display();
     readTdsQuick();
     DHT_read();
     ds18b20(1);
@@ -52,22 +49,21 @@ void init_send_once()
 
 void take_A_rest()
 {
-  //Serial.println(F("reset board after for 12h"));
-  for (int i=6; i>=1; i--)
+  for (int i = 6; i >= 1; i--)
   {
-    client.publish("arduino",num_to_char(i,"arduino taking a rest"));
-    delay(TIME01S*10);
+    client.publish("arduino", num_to_char(i, "arduino taking a rest"));
+    delay(TIME01M);
   }
   resetFunc();
 }
 
 void ar_other()
 {
-  if((millis()-tar)>=TIME01S*5)
+  if (millis() - t4 >= TIME05S)
   {
-    dem+=1;
-    client.publish("arduino",num_to_char(dem," Active"));
-    tar = millis();
+    dem += 1;
+    client.publish("arduino", num_to_char(dem, " Active"));
+    if (dem >= 250) {dem = 0;}
+    t4=millis();
   }
-  if(dem>=250) {dem=0;}
 }

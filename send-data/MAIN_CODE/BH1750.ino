@@ -8,8 +8,6 @@ int BH1750_display()
   if(2==BH1750_Read(0x23))
   {
     val=((buff[0]<<8)|buff[1])/1.2;
-    //Serial.print(val,DEC);     
-    //Serial.println("lux");
     lcd_print(0,2,"Anh sang:       lux");
     lcd_number(10,2,val);
     client.publish("BH1750_1",num_to_char(val," lux"));

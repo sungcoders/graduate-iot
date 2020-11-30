@@ -1,6 +1,4 @@
 
-int giay,phut,gio,ngay,thang,nam,wd;
-char tg[50];
 
 void read_rtc()
 {
@@ -22,9 +20,8 @@ int d2b(byte num) { return ((num/10*16) + (num%10)); }
 
 void rtc_display()
 {
-  sprintf(tg,"%dh:%dp - %d/%d/%d",gio,phut,ngay,thang,nam);
+  sprintf(tg,"%dh:%dp%ds - %d/%d/%d",gio,phut,giay,ngay,thang,nam);
   lcd_print(0,0,tg);
-  //Serial.println(tg);
 }
 
 void set_time( byte hr, byte min, byte sec, byte d, byte mth, byte yr, byte wd)
