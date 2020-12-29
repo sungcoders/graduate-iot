@@ -86,7 +86,7 @@ float get_corriente()
   return(corriente); 
 }
 
-void YHDC30()
+float YHDC30()
 {
   float Irms=get_corriente(); // Dong dien (A)
   Irms=(Irms <0.01)?0:(Irms-0.01);
@@ -96,4 +96,5 @@ void YHDC30()
   lcd_number(6,7,Irms);
   lcd_number(14,7,P);
   (Irms>0.0)?client.publish("on_off_YHDC","RUN"):client.publish("on_off_YHDC","STOP");
+  return (Irms);
 }

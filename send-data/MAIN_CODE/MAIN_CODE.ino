@@ -2,7 +2,6 @@
 #include <PubSubClient.h>
 #include <DallasTemperature.h>
 #include <OneWire.h>
-#include <avr/wdt.h>
 #include <Wire.h>
 #include "DHT.h"
 #include "LCDSPI_SCDT.h"
@@ -12,7 +11,8 @@
 #define   TIME10S     10000
 #define   TIME01M     60000
 #define   TIME01DAY   86400
-#define   TIME30DAY   2592000
+#define   TIME30D     2592000
+#define   ERROR       9999
 
 OneWire onewire(37);
 DallasTemperature sensors_ds(&onewire);
@@ -27,12 +27,14 @@ const uint8_t   gateway[] = {192,168,1,1};
 const uint8_t   subnetmsk[] = {255,255,255,0};
 const char*     mqtt_server = "rauthuycanh.ddns.net";
 
-int   pinout[] = {8,9,10,11,12,6,7};
-byte  dem=0 ;
-int    check_motor = 0;
-unsigned long ts, tar, t_noti,t1,t2,t3,t4,t5;
-int giay,phut,gio,ngay,thang,nam,wd;
-char tg[50];
+int     pinout[] = {8,9,10,11,12,6,7};
+byte    dem=0 ;
+int     check_motor = 0;
+int     stt_dc = 8888;
+int     t2;
+int     giay,phut,gio,ngay,thang,nam,wd;
+char    tg[50];
+unsigned long t1;
 
 extern volatile unsigned long timer0_millis;
 void(* resetFunc) (void) = 0;               //cài đặt hàm reset
@@ -48,36 +50,48 @@ void setup(void)
 
 void loop(void)
 {
-  wdt_enable(WDTO_8S);
-  (!client.connected())?MQTTreconnect():client.loop();  
-  if(millis()-t1>=TIME01S)
+  (!client.connected())?MQTTreconnect():client.loop();
+  if(check_rtc()==1)
   {
-    if(check_rtc()==1)
+    if((phut-t2)>=1  || (phut-t2)<0)
     {
-      read_rtc();
+      Serial2.write("MEGA2560");
       rtc_display();
-      BH1750_display();
-      ds18b20(1);
-      ds18b20(2);
-      t1=millis();
+      t2=phut;
     }
   }
-  if(check_motor==1  && ((millis()-t3)>TIME05S))
+  else
   {
-      YHDC30();
-      t3=millis();
+    if(millis()-t1>=TIME01M)
+    {
+      Serial1.write("MEGA2560");
+      t1=millis();
+    }
+    if(millis()==TIME30D)
+    {
+      milirst();
+    }
+    lcd_print(0, 0, "      RTC not run    ");
   }
-  if(millis()-t2>=TIME01M)
+  if((check_motor==1))
   {
-    Serial2.write("MEGA2560");
-    client.publish("send_update","no request");
-    YHDC30();
-    readTdsQuick();
-    DHT_read();
-    t2=millis();
+    delay(500);
+    if((stt_dc == 1) && (YHDC30()>0.0))
+    {
+      check_motor=ERROR;
+    }
+    else if((stt_dc == 0) && (YHDC30()<=0.05))
+    {
+      client.publish("on_off_YHDC","STOP");
+      check_motor=ERROR;
+    }
+    else if(check_motor>10)
+    {
+      check_motor=ERROR;
+      client.publish("on_off_YHDC","ERROR");
+    }
+    check_motor++;
   }
-  (millis() >= TIME30DAY)?milirst():ar_other();                   // 30 day
-  wdt_disable();
 }
 
 void milirst()

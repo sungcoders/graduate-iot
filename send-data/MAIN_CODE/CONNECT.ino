@@ -30,6 +30,7 @@ void ethernet()
       delay(100);
       resetFunc();                                // ham reset
     }
+    lcd_print(10,5,"success     ");
     delayMicroseconds(200);
   }
 } //end ethetnet
@@ -82,10 +83,10 @@ void callback(char* topic, byte* payload, unsigned int length)
   switch((char)payload[0])
   {
     case 'p':
-      {digitalWrite(8, HIGH); lcd_print(6,4,"OFF");  check_motor = 1;} // relay 1 8
+      {digitalWrite(8, HIGH); lcd_print(6,4,"OFF");  check_motor = 1; stt_dc=0;} // relay 1 8
       break;
     case 'l':
-      {digitalWrite(8, LOW);  lcd_print(6,4,"ON");   check_motor = 0;}
+      {digitalWrite(8, LOW);  lcd_print(6,4,"ON");   check_motor = 1; stt_dc=1;}
       break;
     case 'o':
       {digitalWrite(9, LOW); lcd_print(6,4,"on van2");}  // relay 2 9
@@ -97,7 +98,7 @@ void callback(char* topic, byte* payload, unsigned int length)
       {digitalWrite(10, LOW); lcd_print(6,4,"on dc1  ");} // relay 4 11
       break;
     case 'j':
-      {digitalWrite(10, HIGH);  lcd_print(6,4,"off dc1  ");}  // relay 5 12
+      {digitalWrite(10, HIGH); lcd_print(6,4,"off dc1  ");}  // relay 5 12
       break;
     case 'u':
       {digitalWrite(11, LOW); lcd_print(6,4,"on dc2  ");}   // relay 6 7
@@ -121,7 +122,7 @@ void callback(char* topic, byte* payload, unsigned int length)
       {lcd_print(6,4,"off ac2  "); client.publish("send_update","wait for..."); BH1750_display(); ds18b20(1); ds18b20(2); YHDC30(); DHT_read(); readTdsQuick(); client.publish("send_update","done");}
       break;
     case 'x':
-      {lcd_print(1,0,"request data from server"); BH1750_display(); ds18b20(1); ds18b20(2); YHDC30(); readTdsQuick(); DHT_read(); }
+      {client.publish("stt_server","geting data... - no control"); lcd_print(0,0," request from server "); BH1750_display(); ds18b20(1); ds18b20(2); YHDC30(); readTdsQuick(); DHT_read(); lcd_print(0,0,"     done request    "); client.publish("stt_server","done, Let's control");}
       break;
   }
 }

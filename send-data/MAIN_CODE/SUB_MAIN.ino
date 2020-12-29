@@ -46,24 +46,3 @@ void init_send_once()
     YHDC30();
   }
 }
-
-void take_A_rest()
-{
-  for (int i = 6; i >= 1; i--)
-  {
-    client.publish("arduino", num_to_char(i, "arduino taking a rest"));
-    delay(TIME01M);
-  }
-  resetFunc();
-}
-
-void ar_other()
-{
-  if (millis() - t4 >= TIME05S)
-  {
-    dem += 1;
-    client.publish("arduino", num_to_char(dem, " Active"));
-    if (dem >= 250) {dem = 0;}
-    t4=millis();
-  }
-}
